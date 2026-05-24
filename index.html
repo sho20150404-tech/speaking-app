@@ -145,6 +145,16 @@ select{
   margin-bottom:20px;
 }
 
+.correct{
+  color:#16a34a;
+  font-weight:bold;
+}
+
+.warn{
+  color:#dc2626;
+  font-weight:bold;
+}
+
 </style>
 
 </head>
@@ -202,10 +212,6 @@ onchange="loadConversation()">
 通常会話
 </option>
 
-<option value="improv">
-即興応答
-</option>
-
 <option value="discussion">
 社会問題ディスカッション
 </option>
@@ -222,29 +228,12 @@ onchange="loadConversation()">
 
 <select id="emotion">
 
-<option value="normal">
-通常
-</option>
-
-<option value="formal">
-フォーマル
-</option>
-
-<option value="casual">
-カジュアル
-</option>
-
-<option value="nervous">
-緊張
-</option>
-
-<option value="happy">
-嬉しい
-</option>
-
-<option value="angry">
-怒っている
-</option>
+<option value="normal">通常</option>
+<option value="formal">フォーマル</option>
+<option value="casual">カジュアル</option>
+<option value="nervous">緊張</option>
+<option value="happy">嬉しい</option>
+<option value="angry">怒っている</option>
 
 </select>
 
@@ -337,7 +326,7 @@ id="status">
 <div class="native-box">
 
 <h3>
-ネイティブ音声変化
+ネイティブ音声変化解析
 </h3>
 
 <div id="nativeFeedback">
@@ -668,10 +657,76 @@ function normalizeEnglish(text){
 
   const patterns = [
 
+    /*
+    =====================================
+    基本リンキング
+    =====================================
+    */
+
     [/want to/g,"wanna"],
     [/going to/g,"gonna"],
+    [/got to/g,"gotta"],
+    [/have to/g,"hafta"],
+    [/has to/g,"hasta"],
+    [/used to/g,"usta"],
+
+    /*
+    =====================================
+    同化
+    =====================================
+    */
+
     [/did you/g,"didja"],
-    [/ing/g,"in"]
+    [/could you/g,"couldja"],
+    [/would you/g,"wouldja"],
+    [/meet you/g,"meechu"],
+    [/let you/g,"letchu"],
+    [/don't you/g,"doncha"],
+
+    /*
+    =====================================
+    フラップT
+    =====================================
+    */
+
+    [/water/g,"wadder"],
+    [/better/g,"bedder"],
+    [/get up/g,"gedup"],
+    [/shut up/g,"shudup"],
+    [/a lot of/g,"alotta"],
+
+    /*
+    =====================================
+    リダクション
+    =====================================
+    */
+
+    [/i don't know/g,"dunno"],
+    [/good night/g,"goodnite"],
+    [/next week/g,"nexweek"],
+
+    /*
+    =====================================
+    弱化
+    =====================================
+    */
+
+    [/tell him/g,"tellim"],
+    [/give him/g,"givim"],
+    [/cup of/g,"cuppa"],
+    [/kind of/g,"kinda"],
+    [/sort of/g,"sorta"],
+    [/out of/g,"outta"],
+
+    /*
+    =====================================
+    その他
+    =====================================
+    */
+
+    [/them/g,"em"],
+    [/and/g,"n"],
+    [/ing\b/g,"in"]
 
   ];
 
@@ -681,6 +736,12 @@ function normalizeEnglish(text){
       text.replace(p[0],p[1]);
 
   });
+
+  text =
+    text.replace(/[.,!?]/g,"");
+
+  text =
+    text.replace(/\s+/g," ").trim();
 
   return text;
 }
@@ -818,37 +879,97 @@ function generateFeedback(){
 
   return `
 
-TH音は舌先を軽く前歯に当てましょう。<br><br>
+🔹 TH音は舌先を軽く前歯に当てましょう。<br><br>
 
-R音は口の奥で響かせると自然になります。<br><br>
+🔹 R音は口の奥で響かせると自然になります。<br><br>
 
-単語同士を滑らかにつなげましょう。
+🔹 英語特有の強弱リズムを意識しましょう。<br><br>
+
+🔹 単語同士を滑らかにつなげましょう。
 
 `;
 }
 
 function generateNativeFeedback(spoken){
 
+  spoken =
+    spoken.toLowerCase();
+
   let result = [];
 
-  if(spoken.includes("gonna")){
+  if(
+    spoken.includes("wanna")
+  ){
 
     result.push(
-      "going to → gonna が自然です"
+      "✅ want to → wanna のリンキングが自然です"
     );
   }
 
-  if(spoken.includes("wanna")){
+  if(
+    spoken.includes("gonna")
+  ){
 
     result.push(
-      "want to → wanna が自然です"
+      "✅ going to → gonna の短縮が自然です"
     );
   }
 
-  if(result.length===0){
+  if(
+    spoken.includes("didja")
+  ){
 
     result.push(
-      "リエゾンを増やすと自然です"
+      "✅ did you → didja の同化ができています"
+    );
+  }
+
+  if(
+    spoken.includes("couldja")
+  ){
+
+    result.push(
+      "✅ could you → couldja の音声変化が自然です"
+    );
+  }
+
+  if(
+    spoken.includes("wadder") ||
+    spoken.includes("bedder")
+  ){
+
+    result.push(
+      "✅ Flap T が自然です"
+    );
+  }
+
+  if(
+    spoken.includes("dunno")
+  ){
+
+    result.push(
+      "✅ I don't know → dunno の省略が自然です"
+    );
+  }
+
+  if(
+    spoken.includes("kinda") ||
+    spoken.includes("outta")
+  ){
+
+    result.push(
+      "✅ 弱化表現が自然に使えています"
+    );
+  }
+
+  if(result.length === 0){
+
+    result.push(
+      "⚠ 単語同士をもっと滑らかにつなげると自然になります"
+    );
+
+    result.push(
+      "⚠ T/D/Y の連結音を意識しましょう"
     );
   }
 
@@ -863,7 +984,7 @@ function generateAIComment(score){
 
 非常に自然な英語です。<br><br>
 
-英検1級レベルに近いです。
+英検1級・IELTS高得点レベルです。
 
 `;
   }
@@ -874,7 +995,8 @@ function generateAIComment(score){
 
 かなり良い英語です。<br><br>
 
-さらに滑らかさを意識しましょう。
+さらに滑らかさを意識すると、
+よりネイティブらしくなります。
 
 `;
   }
@@ -882,7 +1004,7 @@ function generateAIComment(score){
   return `
 
 理由・具体例・結論を
-意識すると良くなります。
+意識するとさらに良くなります。
 
 `;
 }
@@ -894,7 +1016,6 @@ function processSpeechResult(spoken){
 
   if(
     mode === "discussion" ||
-    mode === "improv" ||
     mode === "roleplay"
   ){
 
@@ -941,7 +1062,8 @@ ${spoken}
 <li>結論</li>
 </ul>
 
-を意識しましょう。
+を加えると、
+英検1級らしくなります。
 `;
 
     return;
@@ -1086,8 +1208,6 @@ function startRecognition(){
 
   recognition.onerror = function(event){
 
-    console.log(event.error);
-
     let message = "";
 
     switch(event.error){
@@ -1151,8 +1271,6 @@ function startRecognition(){
     recognition.start();
 
   }catch(e){
-
-    console.log(e);
 
     document.getElementById("status")
     .innerText =
