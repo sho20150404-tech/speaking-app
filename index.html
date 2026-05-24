@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+英検1級 実践スピーキングアプリ Ultimate
+</title>
+
+<style>
+
+body{
+  font-family:Arial,sans-serif;
+  background:#f3f4f6;
+  margin:0;
+  padding:20px;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  background:white;
+  padding:24px;
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1{
+  text-align:center;
+}
+
+textarea{
+  width:100%;
+  height:260px;
+  font-size:18px;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+  line-height:1.8;
+}
+
+button{
+  margin-top:12px;
+  margin-right:10px;
+  padding:12px 18px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.listen-btn{
+  background:#10b981;
+  color:white;
+}
+
+.record-btn{
+  background:#3b82f6;
+  color:white;
+}
+
+.shadow-btn{
+  background:#ef4444;
+  color:white;
+}
+
+.next-btn{
+  background:#8b5cf6;
+  color:white;
+}
+
+.random-btn{
+  background:#f59e0b;
+  color:white;
+}
+
+.result-box{
+  margin-top:25px;
+  background:#f9fafb;
+  padding:18px;
+  border-radius:10px;
+}
+
+.score{
+  font-size:56px;
+  font-weight:bold;
+}
+
+.feedback{
+  margin-top:20px;
+  background:#eef2ff;
+  padding:16px;
+  border-radius:10px;
+  line-height:1.8;
+}
+
+.native-box{
+  margin-top:20px;
+  background:#ecfccb;
+  padding:16px;
+  border-radius:10px;
+  line-height:1.8;
+}
+
+.ai-box{
+  margin-top:20px;
+  background:#fff7ed;
+  padding:16px;
+  border-radius:10px;
+  line-height:1.8;
+}
+
+.status{
+  margin-top:15px;
+  color:#666;
+}
+
+select{
+  padding:10px;
+  font-size:16px;
+  border-radius:8px;
+  margin-right:10px;
+  margin-bottom:10px;
+}
+
+.point{
+  margin-bottom:14px;
+}
+
+.mode-box{
+  margin-bottom:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+英検1級 実践スピーキング Ultimate
+</h1>
+
+<div class="mode-box">
+
+<h3>
+場面設定
+</h3>
+
+<select id="scene"
+onchange="changeScene()">
+
+<option value="office">職場</option>
+<option value="classroom">教室</option>
+<option value="meeting">会議室</option>
+<option value="train">電車</option>
+<option value="airport">空港</option>
+<option value="cafe">カフェ</option>
+<option value="hospital">病院</option>
+<option value="restaurant">レストラン</option>
+<option value="jobInterview">就職面接</option>
+<option value="internationalParty">国際交流</option>
+<option value="onlineMeeting">オンライン会議</option>
+<option value="familyDiscussion">家族会議</option>
+<option value="travelTrouble">旅行トラブル</option>
+<option value="bank">銀行</option>
+
+</select>
+
+<h3>
+会話モード
+</h3>
+
+<select id="mode"
+onchange="loadConversation()">
+
+<option value="normal">
+通常会話
+</option>
+
+<option value="improv">
+即興応答
+</option>
+
+<option value="discussion">
+社会問題ディスカッション
+</option>
+
+<option value="roleplay">
+ロールプレイ
+</option>
+
+</select>
+
+<h3>
+感情モード
+</h3>
+
+<select id="emotion">
+
+<option value="normal">
+通常
+</option>
+
+<option value="formal">
+フォーマル
+</option>
+
+<option value="casual">
+カジュアル
+</option>
+
+<option value="nervous">
+緊張
+</option>
+
+<option value="happy">
+嬉しい
+</option>
+
+<option value="angry">
+怒っている
+</option>
+
+</select>
+
+<h3>
+音声速度
+</h3>
+
+<select id="speed">
+
+<option value="0.8">
+0.8x
+</option>
+
+<option value="0.9" selected>
+0.9x
+</option>
+
+<option value="1.0">
+1.0x
+</option>
+
+<option value="1.1">
+1.1x
+</option>
+
+</select>
+
+</div>
+
+<h3>
+会話
+</h3>
+
+<textarea id="text"></textarea>
+
+<br>
+
+<button class="listen-btn"
+onclick="speakConversation()">
+会話を聞く
+</button>
+
+<button class="record-btn"
+onclick="startRecognition()">
+英語で話して採点
+</button>
+
+<button class="shadow-btn"
+onclick="startShadowing()">
+シャドーイング
+</button>
+
+<button class="next-btn"
+onclick="nextConversation()">
+次へ
+</button>
+
+<button class="random-btn"
+onclick="loadRandomConversation()">
+ランダム問題
+</button>
+
+<div class="result-box">
+
+<h3>
+認識結果
+</h3>
+
+<div id="result">
+まだ録音されていません
+</div>
+
+<h3>
+一致率
+</h3>
+
+<div class="score"
+id="score">
+0%
+</div>
+
+<div class="status"
+id="status">
+待機中
+</div>
+
+</div>
+
+<div class="feedback">
+
+<h3>
+発音アドバイス
+</h3>
+
+<div id="feedbackText">
+ここに表示されます
+</div>
+
+</div>
+
+<div class="native-box">
+
+<h3>
+ネイティブ音声変化
+</h3>
+
+<div id="nativeFeedback">
+ここに表示されます
+</div>
+
+</div>
+
+<div class="ai-box">
+
+<h3>
+AI会話フィードバック
+</h3>
+
+<div id="aiFeedback">
+ここに表示されます
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const scenarios = {
+
+office:[
+
+{
+a:"You look exhausted today, Mika.",
+b:"Yeah, I stayed up late preparing for tomorrow's presentation.",
+cJapanese:"そんなにプレッシャーが大きいの？",
+answers:[
+"Is the pressure really that intense?",
+"Is it really that stressful?",
+"Are you under that much pressure?"
+]
+}
+
+],
+
+classroom:[
+
+{
+a:"Did you finish the assignment for Professor Brown?",
+b:"Not yet. The topic was more difficult than I expected.",
+cJapanese:"どの部分が特に難しかったの？",
+answers:[
+"Which part was especially difficult?",
+"What part did you struggle with most?",
+"Which section was the hardest?"
+]
+}
+
+],
+
+meeting:[
+
+{
+a:"We need a new strategy to attract younger customers.",
+b:"Social media marketing might help increase visibility.",
+cJapanese:"でも、それだけでは不十分かもしれない。",
+answers:[
+"However, that alone may not be enough.",
+"But that alone might not solve the issue.",
+"Still, that may not be sufficient."
+]
+}
+
+],
+
+train:[
+
+{
+a:"The train delays have been terrible lately.",
+b:"Apparently there was another accident this morning.",
+cJapanese:"最近インフラの老朽化が問題になっているよね。",
+answers:[
+"Recently, aging infrastructure has become a serious issue.",
+"Infrastructure deterioration has become a major problem lately.",
+"Aging infrastructure is becoming a serious concern."
+]
+}
+
+],
+
+airport:[
+
+{
+a:"The security lines are incredibly long today.",
+b:"There seem to be more international travelers than usual.",
+cJapanese:"観光業が回復してきているのかもしれないね。",
+answers:[
+"Tourism may be recovering.",
+"It could mean the tourism industry is bouncing back.",
+"Perhaps tourism is starting to recover."
+]
+}
+
+],
+
+cafe:[
+
+{
+a:"Remote work has changed the way people communicate.",
+b:"Some people say face-to-face interaction is decreasing.",
+cJapanese:"でもオンラインの方が効率的な場合もあるよ。",
+answers:[
+"However, online communication can sometimes be more efficient.",
+"But working online can also improve efficiency.",
+"Still, online communication may be more practical in some cases."
+]
+}
+
+],
+
+hospital:[
+
+{
+a:"How long have you been experiencing these symptoms?",
+b:"For about three days. I've also had a slight fever.",
+cJapanese:"ストレスが原因の可能性もありますか？",
+answers:[
+"Could stress also be causing it?",
+"Is it possible that stress is contributing to this?",
+"Could stress be one of the causes?"
+]
+}
+
+],
+
+restaurant:[
+
+{
+a:"This restaurant is surprisingly crowded tonight.",
+b:"I heard it was featured on social media recently.",
+cJapanese:"SNSの影響力は本当に大きいね。",
+answers:[
+"Social media really has a huge influence.",
+"The influence of social media is enormous.",
+"Social media has become incredibly influential."
+]
+}
+
+],
+
+jobInterview:[
+
+{
+a:"Why are you interested in joining our company?",
+b:"I'm looking for an environment where I can grow professionally.",
+cJapanese:"ワークライフバランスも重視しています。",
+answers:[
+"I also value work-life balance.",
+"Maintaining a healthy work-life balance is important to me.",
+"I place importance on work-life balance as well."
+]
+}
+
+],
+
+internationalParty:[
+
+{
+a:"So what do you usually do in your free time?",
+b:"I enjoy traveling and meeting people from different cultures.",
+cJapanese:"異文化交流は視野を広げてくれるよね。",
+answers:[
+"Interacting with different cultures broadens our perspectives.",
+"Cultural exchange really expands our horizons.",
+"Experiencing different cultures helps us grow."
+]
+}
+
+],
+
+onlineMeeting:[
+
+{
+a:"Can everyone hear me clearly?",
+b:"Your audio keeps cutting out occasionally.",
+cJapanese:"リモートワークにはまだ課題も多いですね。",
+answers:[
+"There are still many challenges with remote work.",
+"Remote work still comes with several difficulties.",
+"There are still issues that need to be solved in remote work."
+]
+}
+
+],
+
+familyDiscussion:[
+
+{
+a:"Our electricity bill has increased again this month.",
+b:"Energy prices seem to be rising everywhere.",
+cJapanese:"節約をもっと意識しないといけないね。",
+answers:[
+"We need to be more conscious about saving money.",
+"We should become more careful about our spending.",
+"We need to pay more attention to cutting costs."
+]
+}
+
+],
+
+travelTrouble:[
+
+{
+a:"It seems our flight has been delayed again.",
+b:"The weather conditions are getting worse.",
+cJapanese:"最近は異常気象が増えている気がする。",
+answers:[
+"I feel extreme weather is becoming more common recently.",
+"It seems like extreme weather events are increasing.",
+"Abnormal weather patterns seem more frequent these days."
+]
+}
+
+],
+
+bank:[
+
+{
+a:"Would you like to open a savings account today?",
+b:"Yes, I'd also like information about investment options.",
+cJapanese:"将来に備えて資産形成を考えています。",
+answers:[
+"I'm thinking about building assets for the future.",
+"I'm planning for my financial future.",
+"I want to prepare financially for the future."
+]
+}
+
+]
+
+};
+
+const discussionTopics = [
+
+{
+topic:"Climate Change",
+question:
+"What should governments do to address climate change?"
+},
+
+{
+topic:"Artificial Intelligence",
+question:
+"Do you think AI will improve society overall?"
+},
+
+{
+topic:"Education",
+question:
+"Should university education be free?"
+},
+
+{
+topic:"Work Style",
+question:
+"Is remote work better than office work?"
+},
+
+{
+topic:"Social Media",
+question:
+"Has social media improved human communication?"
+}
+
+];
+
+const roleplayTopics = [
+
+{
+situation:
+"You are negotiating salary with your employer."
+},
+
+{
+situation:
+"You are explaining a problem to customer service."
+},
+
+{
+situation:
+"You are discussing education reform with a professor."
+}
+
+];
+
+let currentScene = "office";
+let currentIndex = 0;
+let currentImprov = null;
+let currentDiscussion = null;
+
+function getConversations(){
+
+  return scenarios[currentScene];
+}
+
+function loadConversation(){
+
+  const mode =
+    document.getElementById("mode").value;
+
+  if(mode === "improv"){
+
+    loadImprovConversation();
+
+    return;
+  }
+
+  if(mode === "discussion"){
+
+    const topic =
+      discussionTopics[
+        Math.floor(
+          Math.random() *
+          discussionTopics.length
+        )
+      ];
+
+    currentDiscussion = topic;
+
+    document.getElementById("text").value =
+
+`Discussion Topic:
+
+${topic.topic}
+
+Question:
+
+${topic.question}
+
+自由に英語で答えてください`;
+
+    return;
+  }
+
+  if(mode === "roleplay"){
+
+    const role =
+      roleplayTopics[
+        Math.floor(
+          Math.random() *
+          roleplayTopics.length
+        )
+      ];
+
+    document.getElementById("text").value =
+
+`Roleplay Situation:
+
+${role.situation}
+
+自由に英語で会話してください`;
+
+    return;
+  }
+
+  const convo =
+    getConversations()[currentIndex];
+
+  document.getElementById("text").value =
+
+`A:
+${convo.a}
+
+B:
+${convo.b}
+
+C:
+${convo.cJapanese}`;
+
+  resetDisplay();
+}
+
+function changeScene(){
+
+  currentScene =
+    document.getElementById("scene").value;
+
+  currentIndex = 0;
+
+  loadConversation();
+}
+
+function nextConversation(){
+
+  currentIndex++;
+
+  if(
+    currentIndex >=
+    getConversations().length
+  ){
+    currentIndex = 0;
+  }
+
+  loadConversation();
+}
+
+function loadRandomConversation(){
+
+  currentScene =
+    Object.keys(scenarios)[
+      Math.floor(
+        Math.random() *
+        Object.keys(scenarios).length
+      )
+    ];
+
+  document.getElementById("scene").value =
+    currentScene;
+
+  currentIndex = 0;
+
+  loadConversation();
+}
+
+function resetDisplay(){
+
+  document.getElementById("result")
+  .innerHTML =
+    "まだ録音されていません";
+
+  document.getElementById("score")
+  .innerText =
+    "0%";
+
+  document.getElementById("feedbackText")
+  .innerHTML =
+    "ここに表示されます";
+
+  document.getElementById("nativeFeedback")
+  .innerHTML =
+    "ここに表示されます";
+
+  document.getElementById("aiFeedback")
+  .innerHTML =
+    "ここに表示されます";
+
+  document.getElementById("status")
+  .innerText =
+    "待機中";
+}
+
+function generateRandomConversation(){
+
+  const openings = [
+
+"People seem more stressed these days.",
+"Technology is changing society rapidly.",
+"Many companies are struggling recently.",
+"Young people communicate differently now."
+
+  ];
+
+  const responses = [
+
+"I completely agree.",
+"That's an interesting perspective.",
+"I'm not entirely convinced.",
+"There are advantages and disadvantages."
+
+  ];
+
+  const questions = [
+
+"What do you think about it?",
+"How would you deal with this issue?",
+"Do you think society will improve?",
+"What changes would you make?"
+
+  ];
+
+  return {
+
+a:
+openings[
+Math.floor(
+Math.random()*openings.length
+)
+],
+
+b:
+responses[
+Math.floor(
+Math.random()*responses.length
+)
+],
+
+cJapanese:
+"あなたならどう考えますか？",
+
+answers:[
+questions[
+Math.floor(
+Math.random()*questions.length
+)
+]
+]
+
+  };
+}
+
+function loadImprovConversation(){
+
+  const random =
+    generateRandomConversation();
+
+  currentImprov = random;
+
+  document.getElementById("text").value =
+
+`A:
+${random.a}
+
+B:
+${random.b}
+
+C:
+${random.cJapanese}`;
+}
+
+function speakConversation(){
+
+  speechSynthesis.cancel();
+
+  const text =
+    document.getElementById("text").value;
+
+  const utterance =
+    new SpeechSynthesisUtterance(text);
+
+  utterance.lang = "en-US";
+
+  utterance.rate =
+    parseFloat(
+      document.getElementById("speed").value
+    );
+
+  const emotion =
+    document.getElementById("emotion").value;
+
+  if(emotion === "formal"){
+    utterance.pitch = 0.9;
+    utterance.rate *= 0.92;
+  }
+
+  if(emotion === "casual"){
+    utterance.pitch = 1.1;
+    utterance.rate *= 1.05;
+  }
+
+  if(emotion === "nervous"){
+    utterance.rate *= 1.15;
+  }
+
+  if(emotion === "happy"){
+    utterance.pitch = 1.25;
+  }
+
+  if(emotion === "angry"){
+    utterance.pitch = 0.75;
+  }
+
+  speechSynthesis.speak(utterance);
+}
+
+function startShadowing(){
+
+  speakConversation();
+
+  document.getElementById("status")
+  .innerText =
+    "シャドーイング準備中";
+
+  setTimeout(()=>{
+
+    startRecognition();
+
+  },3500);
+}
+
+function normalizeEnglish(text){
+
+  text = text.toLowerCase();
+
+  const patterns = [
+
+    [/want to/g,"wanna"],
+    [/going to/g,"gonna"],
+    [/got to/g,"gotta"],
+    [/did you/g,"didja"],
+    [/would you/g,"wouldja"],
+    [/could you/g,"couldja"],
+    [/kind of/g,"kinda"],
+    [/out of/g,"outta"],
+    [/a lot of/g,"alotta"],
+    [/them/g,"em"],
+    [/ing/g,"in"]
+
+  ];
+
+  patterns.forEach(p=>{
+
+    text =
+      text.replace(p[0],p[1]);
+
+  });
+
+  return text;
+}
+
+function levenshtein(a,b){
+
+  const matrix=[];
+
+  for(let i=0;i<=b.length;i++){
+    matrix[i]=[i];
+  }
+
+  for(let j=0;j<=a.length;j++){
+    matrix[0][j]=j;
+  }
+
+  for(let i=1;i<=b.length;i++){
+
+    for(let j=1;j<=a.length;j++){
+
+      if(
+        b.charAt(i-1) ===
+        a.charAt(j-1)
+      ){
+
+        matrix[i][j] =
+          matrix[i-1][j-1];
+
+      }else{
+
+        matrix[i][j] =
+          Math.min(
+            matrix[i-1][j-1]+1,
+            matrix[i][j-1]+1,
+            matrix[i-1][j]+1
+          );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
+function calculateSimilarity(
+  original,
+  spoken
+){
+
+  original =
+    normalizeEnglish(original);
+
+  spoken =
+    normalizeEnglish(spoken);
+
+  const distance =
+    levenshtein(original,spoken);
+
+  const maxLength =
+    Math.max(
+      original.length,
+      spoken.length
+    );
+
+  let similarity =
+    Math.round(
+      (1-distance/maxLength)*100
+    );
+
+  similarity += 12;
+
+  if(similarity > 100){
+    similarity = 100;
+  }
+
+  if(similarity < 0){
+    similarity = 0;
+  }
+
+  return similarity;
+}
+
+function getBestScore(
+  answers,
+  spoken
+){
+
+  let best = 0;
+  let bestAnswer = "";
+
+  answers.forEach(answer=>{
+
+    const score =
+      calculateSimilarity(
+        answer,
+        spoken
+      );
+
+    if(score > best){
+
+      best = score;
+      bestAnswer = answer;
+    }
+
+  });
+
+  return {
+    score:best,
+    answer:bestAnswer
+  };
+}
+
+function evaluateFreeSpeech(text){
+
+  let score = 60;
+
+  if(text.length > 40){
+    score += 10;
+  }
+
+  if(
+    text.includes("because") ||
+    text.includes("however") ||
+    text.includes("although")
+  ){
+    score += 10;
+  }
+
+  if(
+    text.includes("society") ||
+    text.includes("government") ||
+    text.includes("technology")
+  ){
+    score += 10;
+  }
+
+  if(score > 100){
+    score = 100;
+  }
+
+  return score;
+}
+
+function generateFeedback(){
+
+  return `
+
+TH音は舌先を軽く前歯に当てましょう。<br><br>
+
+R音は口の奥で響かせると自然になります。<br><br>
+
+英語特有の強弱リズムを意識しましょう。<br><br>
+
+単語同士を滑らかにつなげると
+ネイティブらしく聞こえます。
+
+`;
+}
+
+function generateNativeFeedback(spoken){
+
+  let result = [];
+
+  if(spoken.includes("gonna")){
+
+    result.push(
+      "going to → gonna の崩しが自然です"
+    );
+  }
+
+  if(spoken.includes("wanna")){
+
+    result.push(
+      "want to → wanna のリンキングが自然です"
+    );
+  }
+
+  if(spoken.includes("didja")){
+
+    result.push(
+      "did you → didja が自然です"
+    );
+  }
+
+  if(result.length===0){
+
+    result.push(
+      "リエゾンをさらに増やすと自然です"
+    );
+  }
+
+  return result.join("<br><br>");
+}
+
+function generateAIComment(score){
+
+  if(score >= 90){
+
+    return `
+
+非常に自然な英語です。<br><br>
+
+英検1級やIELTSでも高評価が期待できます。<br><br>
+
+発音・流暢さ・自然さの
+バランスが優れています。
+
+`;
+  }
+
+  if(score >= 75){
+
+    return `
+
+かなり良い英語です。<br><br>
+
+さらにネイティブらしくするには、
+語尾を弱めて発音してみましょう。
+
+`;
+  }
+
+  return `
+
+内容は十分伝わります。<br><br>
+
+理由・具体例・結論を意識すると
+さらに説得力が増します。
+
+`;
+}
+
+function startRecognition(){
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+
+    alert(
+      "このブラウザは未対応です"
+    );
+
+    return;
+  }
+
+  const recognition =
+    new SpeechRecognition();
+
+  recognition.lang = "en-US";
+
+  recognition.interimResults = false;
+
+  recognition.maxAlternatives = 1;
+
+  document.getElementById("status")
+  .innerText =
+    "音声認識中";
+
+  recognition.onresult = function(event){
+
+    const spoken =
+      event.results[0][0].transcript;
+
+    const mode =
+      document.getElementById("mode").value;
+
+    if(
+      mode === "discussion" ||
+      mode === "improv" ||
+      mode === "roleplay"
+    ){
+
+      const freeScore =
+        evaluateFreeSpeech(spoken);
+
+      document.getElementById("result")
+      .innerHTML =
+
+`
+<div class="point">
+
+<b>
+あなた：
+</b>
+
+<br>
+
+${spoken}
+
+</div>
+`;
+
+      document.getElementById("score")
+      .innerText =
+        freeScore + "%";
+
+      document.getElementById("feedbackText")
+      .innerHTML =
+        generateFeedback();
+
+      document.getElementById("nativeFeedback")
+      .innerHTML =
+        generateNativeFeedback(spoken);
+
+      document.getElementById("aiFeedback")
+      .innerHTML =
+
+`
+論理的に話そうとする姿勢が見られます。<br><br>
+
+さらに：
+<ul>
+<li>具体例</li>
+<li>理由</li>
+<li>結論</li>
+</ul>
+
+を加えると、
+英検1級らしい回答になります。
+`;
+
+      return;
+    }
+
+    const convo =
+      getConversations()[currentIndex];
+
+    const best =
+      getBestScore(
+        convo.answers,
+        spoken
+      );
+
+    document.getElementById("result")
+    .innerHTML =
+
+`
+<div class="point">
+
+<b>
+あなた：
+</b>
+
+<br>
+
+${spoken}
+
+</div>
+
+<div class="point">
+
+<b>
+模範解答：
+</b>
+
+<br>
+
+${best.answer}
+
+</div>
+`;
+
+    document.getElementById("score")
+    .innerText =
+      best.score + "%";
+
+    document.getElementById("feedbackText")
+    .innerHTML =
+      generateFeedback();
+
+    document.getElementById("nativeFeedback")
+    .innerHTML =
+      generateNativeFeedback(spoken);
+
+    document.getElementById("aiFeedback")
+    .innerHTML =
+      generateAIComment(best.score);
+
+    if(best.score >= 85){
+
+      document.getElementById("status")
+      .innerText =
+        "Excellent!";
+
+      setTimeout(()=>{
+
+        nextConversation();
+
+      },1800);
+
+    }else{
+
+      document.getElementById("status")
+      .innerText =
+        "もう一度挑戦してみましょう";
+    }
+  };
+
+  recognition.onerror = function(){
+
+    document.getElementById("status")
+    .innerText =
+      "認識エラー";
+  };
+
+  recognition.start();
+}
+
+loadConversation();
+
+</script>
+
+</body>
+
+</html>
