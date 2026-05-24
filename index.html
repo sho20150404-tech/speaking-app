@@ -9,7 +9,7 @@
 content="width=device-width, initial-scale=1.0">
 
 <title>
-英検1級 Ultimate AI Speaking
+英検1級 実践スピーキング Ultimate AI
 </title>
 
 <style>
@@ -17,6 +17,7 @@ content="width=device-width, initial-scale=1.0">
 body{
   font-family:Arial,sans-serif;
   background:#f3f4f6;
+  margin:0;
   padding:20px;
 }
 
@@ -26,6 +27,19 @@ body{
   background:white;
   padding:24px;
   border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1{
+  text-align:center;
+}
+
+.notice{
+  background:#fef3c7;
+  padding:14px;
+  border-radius:10px;
+  margin-bottom:20px;
+  line-height:1.8;
 }
 
 textarea{
@@ -34,7 +48,9 @@ textarea{
   font-size:18px;
   padding:14px;
   border-radius:10px;
-  margin-top:10px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+  line-height:1.8;
 }
 
 button{
@@ -57,9 +73,26 @@ button{
   color:white;
 }
 
+.shadow-btn{
+  background:#ef4444;
+  color:white;
+}
+
 .next-btn{
   background:#8b5cf6;
   color:white;
+}
+
+.random-btn{
+  background:#f59e0b;
+  color:white;
+}
+
+.result-box{
+  margin-top:25px;
+  background:#f9fafb;
+  padding:18px;
+  border-radius:10px;
 }
 
 .score{
@@ -67,11 +100,45 @@ button{
   font-weight:bold;
 }
 
-.box{
+.feedback{
   margin-top:20px;
+  background:#eef2ff;
   padding:16px;
   border-radius:10px;
-  background:#f9fafb;
+  line-height:1.8;
+}
+
+.native-box{
+  margin-top:20px;
+  background:#ecfccb;
+  padding:16px;
+  border-radius:10px;
+  line-height:1.8;
+}
+
+.ai-box{
+  margin-top:20px;
+  background:#fff7ed;
+  padding:16px;
+  border-radius:10px;
+  line-height:1.8;
+}
+
+.status{
+  margin-top:15px;
+  color:#666;
+}
+
+select{
+  padding:10px;
+  font-size:16px;
+  border-radius:8px;
+  margin-right:10px;
+  margin-bottom:10px;
+}
+
+.point{
+  margin-bottom:14px;
 }
 
 </style>
@@ -82,25 +149,35 @@ button{
 
 <div class="container">
 
+<div class="notice">
+
+⚠ iPhone/iPadでは Safari最新版推奨。<br>
+初回はマイク許可が必要です。<br>
+GitHub Pages の https:// URL で開いてください。
+
+</div>
+
 <h1>
-英検1級 Ultimate AI Speaking
+英検1級 実践スピーキング Ultimate AI
 </h1>
 
-<select id="scene">
+<h3>
+場面設定
+</h3>
+
+<select id="scene"
+onchange="loadConversation()">
 
 <option value="office">職場</option>
-<option value="internationalParty">国際交流</option>
-<option value="education">教育</option>
-<option value="environment">環境問題</option>
-<option value="technology">テクノロジー</option>
-<option value="economy">経済</option>
+<option value="classroom">教室</option>
+<option value="meeting">会議室</option>
+<option value="train">電車</option>
 
 </select>
 
-<button class="next-btn"
-onclick="loadConversation()">
-AI問題生成
-</button>
+<h3>
+会話
+</h3>
 
 <textarea id="text"></textarea>
 
@@ -116,7 +193,22 @@ onclick="startRecognition()">
 英語で話して採点
 </button>
 
-<div class="box">
+<button class="shadow-btn"
+onclick="startShadowing()">
+シャドーイング
+</button>
+
+<button class="next-btn"
+onclick="nextConversation()">
+次へ
+</button>
+
+<button class="random-btn"
+onclick="loadConversation()">
+ランダム生成
+</button>
+
+<div class="result-box">
 
 <h3>
 認識結果
@@ -135,19 +227,44 @@ id="score">
 0%
 </div>
 
-<div id="status">
+<div class="status"
+id="status">
 待機中
 </div>
 
 </div>
 
-<div class="box">
+<div class="feedback">
 
 <h3>
-AIフィードバック
+発音アドバイス
 </h3>
 
-<div id="feedback">
+<div id="feedbackText">
+ここに表示されます
+</div>
+
+</div>
+
+<div class="native-box">
+
+<h3>
+ネイティブ音声変化解析
+</h3>
+
+<div id="nativeFeedback">
+ここに表示されます
+</div>
+
+</div>
+
+<div class="ai-box">
+
+<h3>
+AI会話フィードバック
+</h3>
+
+<div id="aiFeedback">
 ここに表示されます
 </div>
 
@@ -157,48 +274,263 @@ AIフィードバック
 
 <script>
 
-const API_URL =
-"https://YOUR-WORKER.workers.dev";
+const sceneData = {
 
-let currentConversation = null;
+office:{
+
+subjects:[
+"the presentation",
+"the deadline",
+"staff shortages",
+"remote work",
+"the client meeting",
+"work-life balance"
+],
+
+replies:[
+"That's been causing a lot of stress lately.",
+"It's becoming a serious issue.",
+"I've been worried about it all week.",
+"Management is discussing possible solutions."
+],
+
+questions:[
+"どう思う？",
+"何か対策はある？",
+"かなり大変そうだね。"
+]
+
+},
+
+classroom:{
+
+subjects:[
+"the assignment",
+"the final exam",
+"group discussions",
+"online classes",
+"research projects"
+],
+
+replies:[
+"It was harder than I expected.",
+"I'm struggling to keep up.",
+"I need more time to prepare.",
+"The professor's expectations are really high."
+],
+
+questions:[
+"どこが難しいの？",
+"先生に相談した？",
+"何か助けが必要？"
+]
+
+},
+
+meeting:{
+
+subjects:[
+"sales performance",
+"marketing strategy",
+"budget cuts",
+"AI adoption",
+"customer feedback"
+],
+
+replies:[
+"The current approach isn't working.",
+"We need a better solution.",
+"Management is very concerned about it.",
+"We should discuss alternative strategies."
+],
+
+questions:[
+"別の案はありますか？",
+"リスクはありますか？",
+"長期的にはどうでしょう？"
+]
+
+},
+
+train:{
+
+subjects:[
+"train delays",
+"crowded stations",
+"commuting stress",
+"infrastructure problems",
+"ticket prices"
+],
+
+replies:[
+"It's getting worse every year.",
+"People are really frustrated.",
+"The government should address it.",
+"Commuting has become exhausting lately."
+],
+
+questions:[
+"原因は何だと思う？",
+"改善できると思う？",
+"かなり不便だよね。"
+]
+
+}
+
+};
 
 let recognition = null;
-
 let isRecognizing = false;
 
-async function loadConversation(){
+function generateAnswers(japanese){
+
+  const patterns = {
+
+"どう思う？":[
+"What do you think?",
+"How do you feel about it?",
+"What's your opinion?"
+],
+
+"何か対策はある？":[
+"Do you have any solutions in mind?",
+"Is there anything we can do?",
+"What measures should we take?"
+],
+
+"かなり大変そうだね。":[
+"That sounds really difficult.",
+"It seems quite challenging.",
+"That must be tough."
+],
+
+"どこが難しいの？":[
+"Which part is difficult?",
+"What are you struggling with?",
+"What seems challenging?"
+],
+
+"先生に相談した？":[
+"Have you talked to the professor?",
+"Did you ask your teacher for help?",
+"Have you consulted your instructor?"
+],
+
+"何か助けが必要？":[
+"Do you need any help?",
+"Is there anything I can do for you?",
+"Would you like some assistance?"
+],
+
+"別の案はありますか？":[
+"Do you have any alternative ideas?",
+"Can we consider another option?",
+"Is there a different approach?"
+],
+
+"リスクはありますか？":[
+"Are there any risks involved?",
+"Could this create additional problems?",
+"What are the possible risks?"
+],
+
+"長期的にはどうでしょう？":[
+"How about in the long term?",
+"Will this work in the future?",
+"Is this sustainable long-term?"
+],
+
+"原因は何だと思う？":[
+"What do you think is causing it?",
+"What do you think the reason is?",
+"Why do you think this is happening?"
+],
+
+"改善できると思う？":[
+"Do you think it can improve?",
+"Will things get better?",
+"Do you think the situation will improve?"
+],
+
+"かなり不便だよね。":[
+"That's really inconvenient.",
+"It must be very frustrating.",
+"That sounds extremely inconvenient."
+]
+
+  };
+
+  return patterns[japanese];
+}
+
+function generateConversation(scene){
+
+  const data = sceneData[scene];
+
+  const subject =
+    data.subjects[
+      Math.floor(Math.random()*data.subjects.length)
+    ];
+
+  const reply =
+    data.replies[
+      Math.floor(Math.random()*data.replies.length)
+    ];
+
+  const jp =
+    data.questions[
+      Math.floor(Math.random()*data.questions.length)
+    ];
+
+  const templates = [
+
+{
+a:`Have you heard about ${subject}?`,
+b:reply
+},
+
+{
+a:`People keep talking about ${subject} lately.`,
+b:reply
+},
+
+{
+a:`What do you think about ${subject}?`,
+b:reply
+},
+
+{
+a:`Everyone at work seems worried about ${subject}.`,
+b:reply
+}
+
+];
+
+  const selected =
+    templates[
+      Math.floor(Math.random()*templates.length)
+    ];
+
+  return {
+    a:selected.a,
+    b:reply,
+    cJapanese:jp,
+    answers:generateAnswers(jp)
+  };
+}
+
+function loadConversation(){
 
   const scene =
     document.getElementById("scene").value;
 
-  document.getElementById("status")
-  .innerText =
-    "AI生成中...";
+  const convo =
+    generateConversation(scene);
 
-  try{
+  window.currentConversation =
+    convo;
 
-    const response =
-      await fetch(API_URL,{
-
-        method:"POST",
-
-        headers:{
-          "Content-Type":"application/json"
-        },
-
-        body:JSON.stringify({
-          scene:scene
-        })
-
-      });
-
-    const convo =
-      await response.json();
-
-    currentConversation =
-      convo;
-
-    document.getElementById("text").value =
+  document.getElementById("text").value =
 
 `A:
 ${convo.a}
@@ -209,18 +541,39 @@ ${convo.b}
 C:
 ${convo.cJapanese}`;
 
-    document.getElementById("status")
-    .innerText =
-      "生成完了";
+  resetDisplay();
+}
 
-  }catch(error){
+function nextConversation(){
 
-    document.getElementById("status")
-    .innerText =
-      "生成失敗";
+  loadConversation();
+}
 
-    console.log(error);
-  }
+function resetDisplay(){
+
+  document.getElementById("result")
+  .innerHTML =
+    "まだ録音されていません";
+
+  document.getElementById("score")
+  .innerText =
+    "0%";
+
+  document.getElementById("feedbackText")
+  .innerHTML =
+    "ここに表示されます";
+
+  document.getElementById("nativeFeedback")
+  .innerHTML =
+    "ここに表示されます";
+
+  document.getElementById("aiFeedback")
+  .innerHTML =
+    "ここに表示されます";
+
+  document.getElementById("status")
+  .innerText =
+    "待機中";
 }
 
 function speakConversation(){
@@ -240,13 +593,53 @@ function speakConversation(){
   speechSynthesis.speak(utterance);
 }
 
+function startShadowing(){
+
+  speakConversation();
+
+  setTimeout(()=>{
+
+    startRecognition();
+
+  },3000);
+}
+
 function normalizeEnglish(text){
 
-  return text
-    .toLowerCase()
-    .replace(/[.,!?]/g,"")
-    .replace(/\s+/g," ")
-    .trim();
+  text = text.toLowerCase();
+
+  const patterns = [
+
+    [/want to/g,"wanna"],
+    [/going to/g,"gonna"],
+    [/got to/g,"gotta"],
+    [/have to/g,"hafta"],
+    [/did you/g,"didja"],
+    [/could you/g,"couldja"],
+    [/would you/g,"wouldja"],
+    [/water/g,"wadder"],
+    [/better/g,"bedder"],
+    [/kind of/g,"kinda"],
+    [/out of/g,"outta"],
+    [/i don't know/g,"dunno"],
+    [/ing\b/g,"in"]
+
+  ];
+
+  patterns.forEach(p=>{
+
+    text =
+      text.replace(p[0],p[1]);
+
+  });
+
+  text =
+    text.replace(/[.,!?]/g,"");
+
+  text =
+    text.replace(/\s+/g," ").trim();
+
+  return text;
 }
 
 function levenshtein(a,b){
@@ -288,38 +681,53 @@ function levenshtein(a,b){
   return matrix[b.length][a.length];
 }
 
-function calculateSimilarity(a,b){
+function calculateSimilarity(
+  original,
+  spoken
+){
 
-  a = normalizeEnglish(a);
+  original =
+    normalizeEnglish(original);
 
-  b = normalizeEnglish(b);
+  spoken =
+    normalizeEnglish(spoken);
 
   const distance =
-    levenshtein(a,b);
+    levenshtein(original,spoken);
 
   const maxLength =
-    Math.max(a.length,b.length);
+    Math.max(
+      original.length,
+      spoken.length
+    );
 
   let similarity =
     Math.round(
       (1-distance/maxLength)*100
     );
 
-  similarity += 10;
+  similarity += 12;
 
   if(similarity > 100){
     similarity = 100;
   }
 
+  if(similarity < 0){
+    similarity = 0;
+  }
+
   return similarity;
 }
 
-function getBestScore(spoken){
+function getBestScore(
+  answers,
+  spoken
+){
 
   let best = 0;
+  let bestAnswer = "";
 
-  currentConversation.answers
-  .forEach(answer=>{
+  answers.forEach(answer=>{
 
     const score =
       calculateSimilarity(
@@ -328,12 +736,196 @@ function getBestScore(spoken){
       );
 
     if(score > best){
+
       best = score;
+      bestAnswer = answer;
     }
 
   });
 
-  return best;
+  return {
+    score:best,
+    answer:bestAnswer
+  };
+}
+
+function generateFeedback(){
+
+  return `
+
+🔹 TH音は舌先を軽く前歯に当てましょう。<br><br>
+
+🔹 R音は口の奥で響かせると自然になります。<br><br>
+
+🔹 強弱リズムを意識すると自然になります。<br><br>
+
+🔹 単語同士を滑らかにつなげましょう。
+
+`;
+}
+
+function generateNativeFeedback(spoken){
+
+  spoken =
+    spoken.toLowerCase();
+
+  let result = [];
+
+  if(spoken.includes("wanna")){
+    result.push(
+      "✅ want to → wanna のリンキングが自然です"
+    );
+  }
+
+  if(spoken.includes("gonna")){
+    result.push(
+      "✅ going to → gonna の短縮が自然です"
+    );
+  }
+
+  if(spoken.includes("didja")){
+    result.push(
+      "✅ did you → didja の同化が自然です"
+    );
+  }
+
+  if(
+    spoken.includes("wadder") ||
+    spoken.includes("bedder")
+  ){
+    result.push(
+      "✅ Flap T が自然です"
+    );
+  }
+
+  if(spoken.includes("dunno")){
+    result.push(
+      "✅ dunno の省略が自然です"
+    );
+  }
+
+  if(result.length === 0){
+
+    result.push(
+      "⚠ もっと単語をつなげると自然になります"
+    );
+
+    result.push(
+      "⚠ リンキングを意識しましょう"
+    );
+  }
+
+  return result.join("<br><br>");
+}
+
+function generateAIComment(score){
+
+  if(score >= 90){
+
+    return `
+
+非常に自然な英語です。<br><br>
+
+英検1級・IELTS高得点レベルです。
+
+`;
+  }
+
+  if(score >= 75){
+
+    return `
+
+かなり自然です。<br><br>
+
+さらにリズム感を意識すると、
+よりネイティブらしくなります。
+
+`;
+  }
+
+  return `
+
+理由・具体例・結論を
+意識するとさらに良くなります。
+
+`;
+}
+
+function processSpeechResult(spoken){
+
+  const convo =
+    window.currentConversation;
+
+  const best =
+    getBestScore(
+      convo.answers,
+      spoken
+    );
+
+  document.getElementById("result")
+  .innerHTML =
+
+`
+<div class="point">
+
+<b>あなた：</b>
+
+<br>
+
+${spoken}
+
+</div>
+
+<div class="point">
+
+<b>模範解答①：</b>
+
+<br>
+
+${convo.answers[0]}
+
+</div>
+
+<div class="point">
+
+<b>模範解答②：</b>
+
+<br>
+
+${convo.answers[1]}
+
+</div>
+
+`;
+
+  document.getElementById("score")
+  .innerText =
+    best.score + "%";
+
+  document.getElementById("feedbackText")
+  .innerHTML =
+    generateFeedback();
+
+  document.getElementById("nativeFeedback")
+  .innerHTML =
+    generateNativeFeedback(spoken);
+
+  document.getElementById("aiFeedback")
+  .innerHTML =
+    generateAIComment(best.score);
+
+  if(best.score >= 85){
+
+    document.getElementById("status")
+    .innerText =
+      "Excellent!";
+
+  }else{
+
+    document.getElementById("status")
+    .innerText =
+      "もう一度挑戦してみましょう";
+  }
 }
 
 function startRecognition(){
@@ -349,7 +941,7 @@ function startRecognition(){
   if(!SpeechRecognition){
 
     alert(
-      "Safari最新版を使用してください"
+      "このブラウザは音声認識に未対応です"
     );
 
     return;
@@ -359,6 +951,11 @@ function startRecognition(){
     new SpeechRecognition();
 
   isRecognizing = true;
+
+  const button =
+    document.querySelector(".record-btn");
+
+  button.disabled = true;
 
   document.getElementById("status")
   .innerText =
@@ -377,90 +974,38 @@ function startRecognition(){
     const spoken =
       event.results[0][0].transcript;
 
-    const score =
-      getBestScore(spoken);
-
-    document.getElementById("result")
-    .innerHTML =
-
-`
-<b>あなた:</b><br>
-${spoken}
-
-<br><br>
-
-<b>模範解答①:</b><br>
-${currentConversation.answers[0]}
-
-<br><br>
-
-<b>模範解答②:</b><br>
-${currentConversation.answers[1]}
-
-<br><br>
-
-<b>模範解答③:</b><br>
-${currentConversation.answers[2]}
-`;
-
-    document.getElementById("score")
-    .innerText =
-      score + "%";
-
-    if(score >= 90){
-
-      document.getElementById("feedback")
-      .innerHTML =
-
-`
-非常に自然な英語です。<br><br>
-
-英検1級・IELTS高得点レベルです。
-`;
-
-    }else if(score >= 75){
-
-      document.getElementById("feedback")
-      .innerHTML =
-
-`
-かなり自然です。<br><br>
-
-さらにリンキングを意識すると、
-よりネイティブらしくなります。
-`;
-
-    }else{
-
-      document.getElementById("feedback")
-      .innerHTML =
-
-`
-理由・具体例・結論を
-意識するとさらに良くなります。
-`;
-    }
-
+    processSpeechResult(spoken);
   };
 
   recognition.onerror = function(event){
 
     document.getElementById("status")
     .innerText =
-      "認識エラー";
-
-    console.log(event.error);
+      "認識エラー: " + event.error;
 
     isRecognizing = false;
+
+    button.disabled = false;
   };
 
   recognition.onend = function(){
 
     isRecognizing = false;
 
-    document.getElementById("status")
-    .innerText =
-      "待機中";
+    button.disabled = false;
+
+    recognition = null;
+
+    if(
+      document.getElementById("status")
+      .innerText ===
+      "音声認識中..."
+    ){
+
+      document.getElementById("status")
+      .innerText =
+        "待機中";
+    }
   };
 
   recognition.start();
