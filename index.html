@@ -618,25 +618,6 @@ function speakConversation(){
       document.getElementById("speed").value
     );
 
-  const emotion =
-    document.getElementById("emotion").value;
-
-  if(emotion === "formal"){
-    utterance.pitch = 0.9;
-  }
-
-  if(emotion === "casual"){
-    utterance.pitch = 1.1;
-  }
-
-  if(emotion === "happy"){
-    utterance.pitch = 1.2;
-  }
-
-  if(emotion === "angry"){
-    utterance.pitch = 0.7;
-  }
-
   speechSynthesis.speak(utterance);
 }
 
@@ -657,24 +638,12 @@ function normalizeEnglish(text){
 
   const patterns = [
 
-    /*
-    =====================================
-    基本リンキング
-    =====================================
-    */
-
     [/want to/g,"wanna"],
     [/going to/g,"gonna"],
     [/got to/g,"gotta"],
     [/have to/g,"hafta"],
     [/has to/g,"hasta"],
     [/used to/g,"usta"],
-
-    /*
-    =====================================
-    同化
-    =====================================
-    */
 
     [/did you/g,"didja"],
     [/could you/g,"couldja"],
@@ -683,33 +652,15 @@ function normalizeEnglish(text){
     [/let you/g,"letchu"],
     [/don't you/g,"doncha"],
 
-    /*
-    =====================================
-    フラップT
-    =====================================
-    */
-
     [/water/g,"wadder"],
     [/better/g,"bedder"],
     [/get up/g,"gedup"],
     [/shut up/g,"shudup"],
     [/a lot of/g,"alotta"],
 
-    /*
-    =====================================
-    リダクション
-    =====================================
-    */
-
     [/i don't know/g,"dunno"],
     [/good night/g,"goodnite"],
     [/next week/g,"nexweek"],
-
-    /*
-    =====================================
-    弱化
-    =====================================
-    */
 
     [/tell him/g,"tellim"],
     [/give him/g,"givim"],
@@ -717,12 +668,6 @@ function normalizeEnglish(text){
     [/kind of/g,"kinda"],
     [/sort of/g,"sorta"],
     [/out of/g,"outta"],
-
-    /*
-    =====================================
-    その他
-    =====================================
-    */
 
     [/them/g,"em"],
     [/and/g,"n"],
@@ -897,37 +842,25 @@ function generateNativeFeedback(spoken){
 
   let result = [];
 
-  if(
-    spoken.includes("wanna")
-  ){
-
+  if(spoken.includes("wanna")){
     result.push(
       "✅ want to → wanna のリンキングが自然です"
     );
   }
 
-  if(
-    spoken.includes("gonna")
-  ){
-
+  if(spoken.includes("gonna")){
     result.push(
       "✅ going to → gonna の短縮が自然です"
     );
   }
 
-  if(
-    spoken.includes("didja")
-  ){
-
+  if(spoken.includes("didja")){
     result.push(
       "✅ did you → didja の同化ができています"
     );
   }
 
-  if(
-    spoken.includes("couldja")
-  ){
-
+  if(spoken.includes("couldja")){
     result.push(
       "✅ could you → couldja の音声変化が自然です"
     );
@@ -937,16 +870,12 @@ function generateNativeFeedback(spoken){
     spoken.includes("wadder") ||
     spoken.includes("bedder")
   ){
-
     result.push(
       "✅ Flap T が自然です"
     );
   }
 
-  if(
-    spoken.includes("dunno")
-  ){
-
+  if(spoken.includes("dunno")){
     result.push(
       "✅ I don't know → dunno の省略が自然です"
     );
@@ -956,7 +885,6 @@ function generateNativeFeedback(spoken){
     spoken.includes("kinda") ||
     spoken.includes("outta")
   ){
-
     result.push(
       "✅ 弱化表現が自然に使えています"
     );
@@ -1094,11 +1022,21 @@ ${spoken}
 
 <div class="point">
 
-<b>模範解答：</b>
+<b>模範解答①：</b>
 
 <br>
 
-${best.answer}
+${convo.answers[0]}
+
+</div>
+
+<div class="point">
+
+<b>模範解答②：</b>
+
+<br>
+
+${convo.answers[1]}
 
 </div>
 `;
