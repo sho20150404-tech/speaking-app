@@ -44,7 +44,7 @@ h1{
 
 textarea{
   width:100%;
-  height:260px;
+  height:300px;
   font-size:18px;
   padding:14px;
   border-radius:10px;
@@ -176,6 +176,26 @@ onchange="loadConversation()">
 </select>
 
 <h3>
+難易度
+</h3>
+
+<select id="level">
+
+<option value="easy">
+準2〜2級
+</option>
+
+<option value="medium">
+準1級
+</option>
+
+<option value="hard">
+1級
+</option>
+
+</select>
+
+<h3>
 会話
 </h3>
 
@@ -274,107 +294,137 @@ AI会話フィードバック
 
 <script>
 
+const emotions = [
+
+"Honestly",
+"Personally",
+"To be frank",
+"Surprisingly",
+"Unfortunately",
+"Lately",
+"These days",
+"In my opinion",
+"From my perspective"
+
+];
+
+const connectors = [
+
+"because",
+"since",
+"even though",
+"while",
+"especially when",
+"as",
+"due to the fact that"
+
+];
+
+const openings = [
+
+"A lot of people have been discussing",
+"The media has recently focused on",
+"Experts are becoming concerned about",
+"Many employees are frustrated with",
+"Society is struggling with",
+"People are paying more attention to"
+
+];
+
+const consequences = [
+
+"which could become a serious problem.",
+"and the situation is getting worse.",
+"so immediate action may be necessary.",
+"which is affecting many people's lives.",
+"and nobody seems to have a clear solution.",
+"which may negatively impact future generations."
+
+];
+
+const advancedSubjects = [
+
+"climate change policies",
+"artificial intelligence regulation",
+"economic inequality",
+"aging populations",
+"cybersecurity threats",
+"mental health awareness",
+"renewable energy",
+"social media addiction",
+"declining birth rates",
+"global inflation",
+"fake news on social media",
+"urban overcrowding",
+"food security",
+"rising healthcare costs",
+"privacy concerns",
+"automation in the workplace",
+"international conflicts",
+"youth unemployment"
+
+];
+
 const sceneData = {
 
 office:{
-
-subjects:[
-"the presentation",
-"the deadline",
-"staff shortages",
-"remote work",
-"the client meeting",
-"work-life balance"
-],
-
+subjects:advancedSubjects,
 replies:[
 "That's been causing a lot of stress lately.",
 "It's becoming a serious issue.",
 "I've been worried about it all week.",
 "Management is discussing possible solutions."
 ],
-
 questions:[
 "どう思う？",
 "何か対策はある？",
 "かなり大変そうだね。"
 ]
-
 },
 
 classroom:{
-
-subjects:[
-"the assignment",
-"the final exam",
-"group discussions",
-"online classes",
-"research projects"
-],
-
+subjects:advancedSubjects,
 replies:[
 "It was harder than I expected.",
 "I'm struggling to keep up.",
 "I need more time to prepare.",
 "The professor's expectations are really high."
 ],
-
 questions:[
 "どこが難しいの？",
 "先生に相談した？",
 "何か助けが必要？"
 ]
-
 },
 
 meeting:{
-
-subjects:[
-"sales performance",
-"marketing strategy",
-"budget cuts",
-"AI adoption",
-"customer feedback"
-],
-
+subjects:advancedSubjects,
 replies:[
 "The current approach isn't working.",
 "We need a better solution.",
 "Management is very concerned about it.",
 "We should discuss alternative strategies."
 ],
-
 questions:[
 "別の案はありますか？",
 "リスクはありますか？",
 "長期的にはどうでしょう？"
 ]
-
 },
 
 train:{
-
-subjects:[
-"train delays",
-"crowded stations",
-"commuting stress",
-"infrastructure problems",
-"ticket prices"
-],
-
+subjects:advancedSubjects,
 replies:[
 "It's getting worse every year.",
 "People are really frustrated.",
 "The government should address it.",
 "Commuting has become exhausting lately."
 ],
-
 questions:[
 "原因は何だと思う？",
 "改善できると思う？",
 "かなり不便だよね。"
 ]
-
 }
 
 };
@@ -384,7 +434,7 @@ let isRecognizing = false;
 
 function generateAnswers(japanese){
 
-  const patterns = {
+const patterns = {
 
 "どう思う？":[
 "What do you think?",
@@ -458,79 +508,150 @@ function generateAnswers(japanese){
 "That sounds extremely inconvenient."
 ]
 
-  };
+};
 
-  return patterns[japanese];
+return patterns[japanese];
+
+}
+
+function generateDynamicAnswers(subject){
+
+const starters = [
+
+"I think",
+"Personally, I believe",
+"In my opinion",
+"From my perspective",
+"It seems to me that"
+
+];
+
+const reasons = [
+
+"the government should take action",
+"people need to become more aware",
+"companies should improve their policies",
+"education plays an important role",
+"international cooperation is necessary",
+"society needs long-term solutions"
+
+];
+
+const endings = [
+
+"before the problem becomes worse.",
+"for future generations.",
+"as soon as possible.",
+"to improve the current situation.",
+"to create a more sustainable society."
+
+];
+
+let answers = [];
+
+for(let i=0;i<3;i++){
+
+const s =
+starters[Math.floor(Math.random()*starters.length)];
+
+const r =
+reasons[Math.floor(Math.random()*reasons.length)];
+
+const e =
+endings[Math.floor(Math.random()*endings.length)];
+
+answers.push(
+`${s} regarding ${subject}, ${r} ${e}`
+);
+
+}
+
+return answers;
+
 }
 
 function generateConversation(scene){
 
-  const data = sceneData[scene];
+const data = sceneData[scene];
 
-  const subject =
-    data.subjects[
-      Math.floor(Math.random()*data.subjects.length)
-    ];
-
-  const reply =
-    data.replies[
-      Math.floor(Math.random()*data.replies.length)
-    ];
-
-  const jp =
-    data.questions[
-      Math.floor(Math.random()*data.questions.length)
-    ];
-
-  const templates = [
-
-{
-a:`Have you heard about ${subject}?`,
-b:reply
-},
-
-{
-a:`People keep talking about ${subject} lately.`,
-b:reply
-},
-
-{
-a:`What do you think about ${subject}?`,
-b:reply
-},
-
-{
-a:`Everyone at work seems worried about ${subject}.`,
-b:reply
-}
-
+const subject =
+data.subjects[
+Math.floor(Math.random()*data.subjects.length)
 ];
 
-  const selected =
-    templates[
-      Math.floor(Math.random()*templates.length)
-    ];
+const emotion =
+emotions[
+Math.floor(Math.random()*emotions.length)
+];
 
-  return {
-    a:selected.a,
-    b:reply,
-    cJapanese:jp,
-    answers:generateAnswers(jp)
-  };
+const opening =
+openings[
+Math.floor(Math.random()*openings.length)
+];
+
+const connector =
+connectors[
+Math.floor(Math.random()*connectors.length)
+];
+
+const consequence =
+consequences[
+Math.floor(Math.random()*consequences.length)
+];
+
+let reply =
+data.replies[
+Math.floor(Math.random()*data.replies.length)
+];
+
+const jp =
+data.questions[
+Math.floor(Math.random()*data.questions.length)
+];
+
+const sentenceA =
+
+`${emotion}, ${opening} ${subject} ${connector} many experts believe that it could significantly affect society in the near future.`;
+
+let sentenceB =
+
+`${reply} ${consequence}`;
+
+if(Math.random() > 0.5){
+
+sentenceB +=
+" Many people are starting to feel anxious about the future.";
+
+}else{
+
+sentenceB +=
+" Some experts believe immediate action is necessary.";
+
+}
+
+return {
+
+a:sentenceA,
+b:sentenceB,
+cJapanese:jp,
+answers:generateDynamicAnswers(subject)
+
+};
+
 }
 
 function loadConversation(){
 
-  const scene =
-    document.getElementById("scene").value;
+const scene =
+document.getElementById("scene").value;
 
-  const convo =
-    generateConversation(scene);
+const convo =
+generateConversation(scene);
 
-  window.currentConversation =
-    convo;
+window.currentConversation =
+convo;
 
-  document.getElementById("text").value =
+document.getElementById("text").value =
 
 `A:
 ${convo.a}
@@ -541,299 +662,382 @@ ${convo.b}
 C:
 ${convo.cJapanese}`;
 
-  resetDisplay();
+resetDisplay();
+
 }
 
 function nextConversation(){
 
-  loadConversation();
+loadConversation();
+
 }
 
 function resetDisplay(){
 
-  document.getElementById("result")
-  .innerHTML =
-    "まだ録音されていません";
+document.getElementById("result")
+.innerHTML =
+"まだ録音されていません";
 
-  document.getElementById("score")
-  .innerText =
-    "0%";
+document.getElementById("score")
+.innerText =
+"0%";
 
-  document.getElementById("feedbackText")
-  .innerHTML =
-    "ここに表示されます";
+document.getElementById("feedbackText")
+.innerHTML =
+"ここに表示されます";
 
-  document.getElementById("nativeFeedback")
-  .innerHTML =
-    "ここに表示されます";
+document.getElementById("nativeFeedback")
+.innerHTML =
+"ここに表示されます";
 
-  document.getElementById("aiFeedback")
-  .innerHTML =
-    "ここに表示されます";
+document.getElementById("aiFeedback")
+.innerHTML =
+"ここに表示されます";
 
-  document.getElementById("status")
-  .innerText =
-    "待機中";
+document.getElementById("status")
+.innerText =
+"待機中";
+
 }
 
 function speakConversation(){
 
-  speechSynthesis.cancel();
+speechSynthesis.cancel();
 
-  const text =
-    document.getElementById("text").value;
+const text =
+document.getElementById("text").value;
 
-  const utterance =
-    new SpeechSynthesisUtterance(text);
+const utterance =
+new SpeechSynthesisUtterance(text);
 
-  utterance.lang = "en-US";
+utterance.lang = "en-US";
 
-  utterance.rate = 0.9;
+const level =
+document.getElementById("level").value;
 
-  speechSynthesis.speak(utterance);
+if(level==="easy"){
+utterance.rate = 0.8;
+}
+
+if(level==="medium"){
+utterance.rate = 0.95;
+}
+
+if(level==="hard"){
+utterance.rate = 1.1;
+}
+
+speechSynthesis.speak(utterance);
+
 }
 
 function startShadowing(){
 
-  speakConversation();
+speakConversation();
 
-  setTimeout(()=>{
+setTimeout(()=>{
 
-    startRecognition();
+startRecognition();
 
-  },3000);
+},3000);
+
 }
 
 function normalizeEnglish(text){
 
-  text = text.toLowerCase();
+text = text.toLowerCase();
 
-  const patterns = [
+const patterns = [
 
-    [/want to/g,"wanna"],
-    [/going to/g,"gonna"],
-    [/got to/g,"gotta"],
-    [/have to/g,"hafta"],
-    [/did you/g,"didja"],
-    [/could you/g,"couldja"],
-    [/would you/g,"wouldja"],
-    [/water/g,"wadder"],
-    [/better/g,"bedder"],
-    [/kind of/g,"kinda"],
-    [/out of/g,"outta"],
-    [/i don't know/g,"dunno"],
-    [/ing\b/g,"in"]
+[/want to/g,"wanna"],
+[/going to/g,"gonna"],
+[/got to/g,"gotta"],
+[/have to/g,"hafta"],
+[/did you/g,"didja"],
+[/could you/g,"couldja"],
+[/would you/g,"wouldja"],
+[/water/g,"wadder"],
+[/better/g,"bedder"],
+[/kind of/g,"kinda"],
+[/out of/g,"outta"],
+[/i don't know/g,"dunno"],
+[/ing\b/g,"in"],
+[/let me/g,"lemme"],
+[/give me/g,"gimme"],
+[/want you to/g,"wantcha"],
+[/what are you/g,"whatcha"],
+[/have got to/g,"hafta"],
+[/trying to/g,"tryna"],
+[/used to/g,"usta"],
+[/should have/g,"shoulda"],
+[/could have/g,"coulda"],
+[/would have/g,"woulda"],
+[/sort of/g,"sorta"],
+[/a lot of/g,"alotta"]
 
-  ];
+];
 
-  patterns.forEach(p=>{
+patterns.forEach(p=>{
 
-    text =
-      text.replace(p[0],p[1]);
+text =
+text.replace(p[0],p[1]);
 
-  });
+});
 
-  text =
-    text.replace(/[.,!?]/g,"");
+text =
+text.replace(/[.,!?]/g,"");
 
-  text =
-    text.replace(/\s+/g," ").trim();
+text =
+text.replace(/\s+/g," ").trim();
 
-  return text;
+return text;
+
 }
 
 function levenshtein(a,b){
 
-  const matrix=[];
+const matrix=[];
 
-  for(let i=0;i<=b.length;i++){
-    matrix[i]=[i];
-  }
+for(let i=0;i<=b.length;i++){
+matrix[i]=[i];
+}
 
-  for(let j=0;j<=a.length;j++){
-    matrix[0][j]=j;
-  }
+for(let j=0;j<=a.length;j++){
+matrix[0][j]=j;
+}
 
-  for(let i=1;i<=b.length;i++){
+for(let i=1;i<=b.length;i++){
 
-    for(let j=1;j<=a.length;j++){
+for(let j=1;j<=a.length;j++){
 
-      if(
-        b.charAt(i-1) ===
-        a.charAt(j-1)
-      ){
+if(
+b.charAt(i-1) ===
+a.charAt(j-1)
+){
 
-        matrix[i][j] =
-          matrix[i-1][j-1];
+matrix[i][j] =
+matrix[i-1][j-1];
 
-      }else{
+}else{
 
-        matrix[i][j] =
-          Math.min(
-            matrix[i-1][j-1]+1,
-            matrix[i][j-1]+1,
-            matrix[i-1][j]+1
-          );
-      }
-    }
-  }
+matrix[i][j] =
+Math.min(
+matrix[i-1][j-1]+1,
+matrix[i][j-1]+1,
+matrix[i-1][j]+1
+);
 
-  return matrix[b.length][a.length];
+}
+
+}
+
+}
+
+return matrix[b.length][a.length];
+
 }
 
 function calculateSimilarity(
-  original,
-  spoken
+original,
+spoken
 ){
 
-  original =
-    normalizeEnglish(original);
+original =
+normalizeEnglish(original);
 
-  spoken =
-    normalizeEnglish(spoken);
+spoken =
+normalizeEnglish(spoken);
 
-  const distance =
-    levenshtein(original,spoken);
+const distance =
+levenshtein(original,spoken);
 
-  const maxLength =
-    Math.max(
-      original.length,
-      spoken.length
-    );
+const maxLength =
+Math.max(
+original.length,
+spoken.length
+);
 
-  let similarity =
-    Math.round(
-      (1-distance/maxLength)*100
-    );
+let similarity =
+Math.round(
+(1-distance/maxLength)*100
+);
 
-  similarity += 12;
+similarity += 18;
 
-  if(similarity > 100){
-    similarity = 100;
-  }
+if(similarity > 100){
+similarity = 100;
+}
 
-  if(similarity < 0){
-    similarity = 0;
-  }
+if(similarity < 0){
+similarity = 0;
+}
 
-  return similarity;
+return similarity;
+
 }
 
 function getBestScore(
-  answers,
-  spoken
+answers,
+spoken
 ){
 
-  let best = 0;
-  let bestAnswer = "";
+let best = 0;
+let bestAnswer = "";
 
-  answers.forEach(answer=>{
+answers.forEach(answer=>{
 
-    const score =
-      calculateSimilarity(
-        answer,
-        spoken
-      );
+const score =
+calculateSimilarity(
+answer,
+spoken
+);
 
-    if(score > best){
+if(score > best){
 
-      best = score;
-      bestAnswer = answer;
-    }
+best = score;
+bestAnswer = answer;
 
-  });
-
-  return {
-    score:best,
-    answer:bestAnswer
-  };
 }
 
-function generateFeedback(){
+});
 
-  return `
+return {
+score:best,
+answer:bestAnswer
+};
 
-🔹 TH音は舌先を軽く前歯に当てましょう。<br><br>
+}
 
-🔹 R音は口の奥で響かせると自然になります。<br><br>
+function generateFeedback(spoken){
 
-🔹 強弱リズムを意識すると自然になります。<br><br>
+spoken = spoken.toLowerCase();
 
-🔹 単語同士を滑らかにつなげましょう。
+let tips = [];
 
-`;
+if(spoken.includes("r")){
+
+tips.push(
+"✅ R音が比較的自然です"
+);
+
+}else{
+
+tips.push(
+"⚠ R音が弱い可能性があります"
+);
+
+}
+
+if(spoken.includes("th")){
+
+tips.push(
+"✅ TH音が意識されています"
+);
+
+}else{
+
+tips.push(
+"⚠ TH音をもう少し意識しましょう"
+);
+
+}
+
+if(
+spoken.includes("wanna") ||
+spoken.includes("gonna")
+){
+
+tips.push(
+"✅ ネイティブ特有の短縮が自然です"
+);
+
+}
+
+tips.push(
+"🔹 強弱リズムを意識するとさらに自然になります"
+);
+
+tips.push(
+"🔹 単語同士を滑らかにつなげましょう"
+);
+
+return tips.join("<br><br>");
+
 }
 
 function generateNativeFeedback(spoken){
 
-  spoken =
-    spoken.toLowerCase();
+spoken =
+spoken.toLowerCase();
 
-  let result = [];
+let result = [];
 
-  if(spoken.includes("wanna")){
-    result.push(
-      "✅ want to → wanna のリンキングが自然です"
-    );
-  }
+if(spoken.includes("wanna")){
+result.push(
+"✅ want to → wanna のリンキングが自然です"
+);
+}
 
-  if(spoken.includes("gonna")){
-    result.push(
-      "✅ going to → gonna の短縮が自然です"
-    );
-  }
+if(spoken.includes("gonna")){
+result.push(
+"✅ going to → gonna の短縮が自然です"
+);
+}
 
-  if(spoken.includes("didja")){
-    result.push(
-      "✅ did you → didja の同化が自然です"
-    );
-  }
+if(spoken.includes("didja")){
+result.push(
+"✅ did you → didja の同化が自然です"
+);
+}
 
-  if(
-    spoken.includes("wadder") ||
-    spoken.includes("bedder")
-  ){
-    result.push(
-      "✅ Flap T が自然です"
-    );
-  }
+if(
+spoken.includes("wadder") ||
+spoken.includes("bedder")
+){
+result.push(
+"✅ Flap T が自然です"
+);
+}
 
-  if(spoken.includes("dunno")){
-    result.push(
-      "✅ dunno の省略が自然です"
-    );
-  }
+if(spoken.includes("dunno")){
+result.push(
+"✅ dunno の省略が自然です"
+);
+}
 
-  if(result.length === 0){
+if(result.length === 0){
 
-    result.push(
-      "⚠ もっと単語をつなげると自然になります"
-    );
+result.push(
+"⚠ もっと単語をつなげると自然になります"
+);
 
-    result.push(
-      "⚠ リンキングを意識しましょう"
-    );
-  }
+result.push(
+"⚠ リンキングを意識しましょう"
+);
 
-  return result.join("<br><br>");
+}
+
+return result.join("<br><br>");
+
 }
 
 function generateAIComment(score){
 
-  if(score >= 90){
+if(score >= 90){
 
-    return `
+return `
 
 非常に自然な英語です。<br><br>
 
 英検1級・IELTS高得点レベルです。
 
 `;
-  }
 
-  if(score >= 75){
+}
 
-    return `
+if(score >= 75){
+
+return `
 
 かなり自然です。<br><br>
 
@@ -841,29 +1045,31 @@ function generateAIComment(score){
 よりネイティブらしくなります。
 
 `;
-  }
 
-  return `
+}
+
+return `
 
 理由・具体例・結論を
 意識するとさらに良くなります。
 
 `;
+
 }
 
 function processSpeechResult(spoken){
 
-  const convo =
-    window.currentConversation;
+const convo =
+window.currentConversation;
 
-  const best =
-    getBestScore(
-      convo.answers,
-      spoken
-    );
+const best =
+getBestScore(
+convo.answers,
+spoken
+);
 
-  document.getElementById("result")
-  .innerHTML =
+document.getElementById("result")
+.innerHTML =
 
 `
 <div class="point">
@@ -896,119 +1102,137 @@ ${convo.answers[1]}
 
 </div>
 
+<div class="point">
+
+<b>模範解答③：</b>
+
+<br>
+
+${convo.answers[2]}
+
+</div>
+
 `;
 
-  document.getElementById("score")
-  .innerText =
-    best.score + "%";
+document.getElementById("score")
+.innerText =
+best.score + "%";
 
-  document.getElementById("feedbackText")
-  .innerHTML =
-    generateFeedback();
+document.getElementById("feedbackText")
+.innerHTML =
+generateFeedback(spoken);
 
-  document.getElementById("nativeFeedback")
-  .innerHTML =
-    generateNativeFeedback(spoken);
+document.getElementById("nativeFeedback")
+.innerHTML =
+generateNativeFeedback(spoken);
 
-  document.getElementById("aiFeedback")
-  .innerHTML =
-    generateAIComment(best.score);
+document.getElementById("aiFeedback")
+.innerHTML =
+generateAIComment(best.score);
 
-  if(best.score >= 85){
+if(best.score >= 85){
 
-    document.getElementById("status")
-    .innerText =
-      "Excellent!";
+document.getElementById("status")
+.innerText =
+"Excellent!";
 
-  }else{
+}else{
 
-    document.getElementById("status")
-    .innerText =
-      "もう一度挑戦してみましょう";
-  }
+document.getElementById("status")
+.innerText =
+"もう一度挑戦してみましょう";
+
+}
+
 }
 
 function startRecognition(){
 
-  if(isRecognizing){
-    return;
-  }
+if(isRecognizing){
+return;
+}
 
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
 
-  if(!SpeechRecognition){
+if(!SpeechRecognition){
 
-    alert(
-      "このブラウザは音声認識に未対応です"
-    );
+alert(
+"このブラウザは音声認識に未対応です"
+);
 
-    return;
-  }
+return;
 
-  recognition =
-    new SpeechRecognition();
+}
 
-  isRecognizing = true;
+recognition =
+new SpeechRecognition();
 
-  const button =
-    document.querySelector(".record-btn");
+isRecognizing = true;
 
-  button.disabled = true;
+const button =
+document.querySelector(".record-btn");
 
-  document.getElementById("status")
-  .innerText =
-    "音声認識中...";
+button.disabled = true;
 
-  recognition.lang = "en-US";
+document.getElementById("status")
+.innerText =
+"音声認識中...";
 
-  recognition.interimResults = false;
+recognition.lang = "en-US";
 
-  recognition.continuous = false;
+recognition.interimResults = false;
 
-  recognition.maxAlternatives = 1;
+recognition.continuous = false;
 
-  recognition.onresult = function(event){
+recognition.maxAlternatives = 1;
 
-    const spoken =
-      event.results[0][0].transcript;
+recognition.onresult = function(event){
 
-    processSpeechResult(spoken);
-  };
+const spoken =
+event.results[0][0].transcript;
 
-  recognition.onerror = function(event){
+processSpeechResult(spoken);
 
-    document.getElementById("status")
-    .innerText =
-      "認識エラー: " + event.error;
+};
 
-    isRecognizing = false;
+recognition.onerror = function(event){
 
-    button.disabled = false;
-  };
+document.getElementById("status")
+.innerText =
+"認識エラー: " + event.error;
 
-  recognition.onend = function(){
+isRecognizing = false;
 
-    isRecognizing = false;
+button.disabled = false;
 
-    button.disabled = false;
+};
 
-    recognition = null;
+recognition.onend = function(){
 
-    if(
-      document.getElementById("status")
-      .innerText ===
-      "音声認識中..."
-    ){
+isRecognizing = false;
 
-      document.getElementById("status")
-      .innerText =
-        "待機中";
-    }
-  };
+button.disabled = false;
 
-  recognition.start();
+recognition = null;
+
+if(
+document.getElementById("status")
+.innerText ===
+"音声認識中..."
+){
+
+document.getElementById("status")
+.innerText =
+"待機中";
+
+}
+
+};
+
+recognition.start();
+
 }
 
 loadConversation();
@@ -1016,5 +1240,4 @@ loadConversation();
 </script>
 
 </body>
-
 </html>
