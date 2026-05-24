@@ -34,6 +34,14 @@ h1{
   text-align:center;
 }
 
+.notice{
+  background:#fef3c7;
+  padding:14px;
+  border-radius:10px;
+  margin-bottom:20px;
+  line-height:1.8;
+}
+
 textarea{
   width:100%;
   height:260px;
@@ -145,6 +153,14 @@ select{
 
 <div class="container">
 
+<div class="notice">
+
+⚠ iPhone/iPadでは Safari最新版推奨。<br>
+初回はマイク許可が必要です。<br>
+GitHub Pages の https:// URL で開いてください。
+
+</div>
+
 <h1>
 英検1級 実践スピーキング Ultimate
 </h1>
@@ -238,21 +254,10 @@ onchange="loadConversation()">
 
 <select id="speed">
 
-<option value="0.8">
-0.8x
-</option>
-
-<option value="0.9" selected>
-0.9x
-</option>
-
-<option value="1.0">
-1.0x
-</option>
-
-<option value="1.1">
-1.1x
-</option>
+<option value="0.8">0.8x</option>
+<option value="0.9" selected>0.9x</option>
+<option value="1.0">1.0x</option>
+<option value="1.1">1.1x</option>
 
 </select>
 
@@ -417,156 +422,6 @@ answers:[
 ]
 }
 
-],
-
-airport:[
-
-{
-a:"The security lines are incredibly long today.",
-b:"There seem to be more international travelers than usual.",
-cJapanese:"観光業が回復してきているのかもしれないね。",
-answers:[
-"Tourism may be recovering.",
-"It could mean the tourism industry is bouncing back.",
-"Perhaps tourism is starting to recover."
-]
-}
-
-],
-
-cafe:[
-
-{
-a:"Remote work has changed the way people communicate.",
-b:"Some people say face-to-face interaction is decreasing.",
-cJapanese:"でもオンラインの方が効率的な場合もあるよ。",
-answers:[
-"However, online communication can sometimes be more efficient.",
-"But working online can also improve efficiency.",
-"Still, online communication may be more practical in some cases."
-]
-}
-
-],
-
-hospital:[
-
-{
-a:"How long have you been experiencing these symptoms?",
-b:"For about three days. I've also had a slight fever.",
-cJapanese:"ストレスが原因の可能性もありますか？",
-answers:[
-"Could stress also be causing it?",
-"Is it possible that stress is contributing to this?",
-"Could stress be one of the causes?"
-]
-}
-
-],
-
-restaurant:[
-
-{
-a:"This restaurant is surprisingly crowded tonight.",
-b:"I heard it was featured on social media recently.",
-cJapanese:"SNSの影響力は本当に大きいね。",
-answers:[
-"Social media really has a huge influence.",
-"The influence of social media is enormous.",
-"Social media has become incredibly influential."
-]
-}
-
-],
-
-jobInterview:[
-
-{
-a:"Why are you interested in joining our company?",
-b:"I'm looking for an environment where I can grow professionally.",
-cJapanese:"ワークライフバランスも重視しています。",
-answers:[
-"I also value work-life balance.",
-"Maintaining a healthy work-life balance is important to me.",
-"I place importance on work-life balance as well."
-]
-}
-
-],
-
-internationalParty:[
-
-{
-a:"So what do you usually do in your free time?",
-b:"I enjoy traveling and meeting people from different cultures.",
-cJapanese:"異文化交流は視野を広げてくれるよね。",
-answers:[
-"Interacting with different cultures broadens our perspectives.",
-"Cultural exchange really expands our horizons.",
-"Experiencing different cultures helps us grow."
-]
-}
-
-],
-
-onlineMeeting:[
-
-{
-a:"Can everyone hear me clearly?",
-b:"Your audio keeps cutting out occasionally.",
-cJapanese:"リモートワークにはまだ課題も多いですね。",
-answers:[
-"There are still many challenges with remote work.",
-"Remote work still comes with several difficulties.",
-"There are still issues that need to be solved in remote work."
-]
-}
-
-],
-
-familyDiscussion:[
-
-{
-a:"Our electricity bill has increased again this month.",
-b:"Energy prices seem to be rising everywhere.",
-cJapanese:"節約をもっと意識しないといけないね。",
-answers:[
-"We need to be more conscious about saving money.",
-"We should become more careful about our spending.",
-"We need to pay more attention to cutting costs."
-]
-}
-
-],
-
-travelTrouble:[
-
-{
-a:"It seems our flight has been delayed again.",
-b:"The weather conditions are getting worse.",
-cJapanese:"最近は異常気象が増えている気がする。",
-answers:[
-"I feel extreme weather is becoming more common recently.",
-"It seems like extreme weather events are increasing.",
-"Abnormal weather patterns seem more frequent these days."
-]
-}
-
-],
-
-bank:[
-
-{
-a:"Would you like to open a savings account today?",
-b:"Yes, I'd also like information about investment options.",
-cJapanese:"将来に備えて資産形成を考えています。",
-answers:[
-"I'm thinking about building assets for the future.",
-"I'm planning for my financial future.",
-"I want to prepare financially for the future."
-]
-}
-
 ]
 
 };
@@ -589,18 +444,6 @@ question:
 topic:"Education",
 question:
 "Should university education be free?"
-},
-
-{
-topic:"Work Style",
-question:
-"Is remote work better than office work?"
-},
-
-{
-topic:"Social Media",
-question:
-"Has social media improved human communication?"
 }
 
 ];
@@ -614,11 +457,6 @@ situation:
 
 {
 situation:
-"You are explaining a problem to customer service."
-},
-
-{
-situation:
 "You are discussing education reform with a professor."
 }
 
@@ -626,25 +464,63 @@ situation:
 
 let currentScene = "office";
 let currentIndex = 0;
-let currentImprov = null;
-let currentDiscussion = null;
+
+let recognition = null;
+let isRecognizing = false;
 
 function getConversations(){
 
   return scenarios[currentScene];
 }
 
+function changeScene(){
+
+  currentScene =
+    document.getElementById("scene").value;
+
+  currentIndex = 0;
+
+  loadConversation();
+}
+
+function nextConversation(){
+
+  currentIndex++;
+
+  if(
+    currentIndex >=
+    getConversations().length
+  ){
+    currentIndex = 0;
+  }
+
+  loadConversation();
+}
+
+function loadRandomConversation(){
+
+  const keys =
+    Object.keys(scenarios);
+
+  currentScene =
+    keys[
+      Math.floor(
+        Math.random()*keys.length
+      )
+    ];
+
+  document.getElementById("scene").value =
+    currentScene;
+
+  currentIndex = 0;
+
+  loadConversation();
+}
+
 function loadConversation(){
 
   const mode =
     document.getElementById("mode").value;
-
-  if(mode === "improv"){
-
-    loadImprovConversation();
-
-    return;
-  }
 
   if(mode === "discussion"){
 
@@ -655,8 +531,6 @@ function loadConversation(){
           discussionTopics.length
         )
       ];
-
-    currentDiscussion = topic;
 
     document.getElementById("text").value =
 
@@ -711,48 +585,6 @@ ${convo.cJapanese}`;
   resetDisplay();
 }
 
-function changeScene(){
-
-  currentScene =
-    document.getElementById("scene").value;
-
-  currentIndex = 0;
-
-  loadConversation();
-}
-
-function nextConversation(){
-
-  currentIndex++;
-
-  if(
-    currentIndex >=
-    getConversations().length
-  ){
-    currentIndex = 0;
-  }
-
-  loadConversation();
-}
-
-function loadRandomConversation(){
-
-  currentScene =
-    Object.keys(scenarios)[
-      Math.floor(
-        Math.random() *
-        Object.keys(scenarios).length
-      )
-    ];
-
-  document.getElementById("scene").value =
-    currentScene;
-
-  currentIndex = 0;
-
-  loadConversation();
-}
-
 function resetDisplay(){
 
   document.getElementById("result")
@@ -780,84 +612,6 @@ function resetDisplay(){
     "待機中";
 }
 
-function generateRandomConversation(){
-
-  const openings = [
-
-"People seem more stressed these days.",
-"Technology is changing society rapidly.",
-"Many companies are struggling recently.",
-"Young people communicate differently now."
-
-  ];
-
-  const responses = [
-
-"I completely agree.",
-"That's an interesting perspective.",
-"I'm not entirely convinced.",
-"There are advantages and disadvantages."
-
-  ];
-
-  const questions = [
-
-"What do you think about it?",
-"How would you deal with this issue?",
-"Do you think society will improve?",
-"What changes would you make?"
-
-  ];
-
-  return {
-
-a:
-openings[
-Math.floor(
-Math.random()*openings.length
-)
-],
-
-b:
-responses[
-Math.floor(
-Math.random()*responses.length
-)
-],
-
-cJapanese:
-"あなたならどう考えますか？",
-
-answers:[
-questions[
-Math.floor(
-Math.random()*questions.length
-)
-]
-]
-
-  };
-}
-
-function loadImprovConversation(){
-
-  const random =
-    generateRandomConversation();
-
-  currentImprov = random;
-
-  document.getElementById("text").value =
-
-`A:
-${random.a}
-
-B:
-${random.b}
-
-C:
-${random.cJapanese}`;
-}
-
 function speakConversation(){
 
   speechSynthesis.cancel();
@@ -880,24 +634,18 @@ function speakConversation(){
 
   if(emotion === "formal"){
     utterance.pitch = 0.9;
-    utterance.rate *= 0.92;
   }
 
   if(emotion === "casual"){
     utterance.pitch = 1.1;
-    utterance.rate *= 1.05;
-  }
-
-  if(emotion === "nervous"){
-    utterance.rate *= 1.15;
   }
 
   if(emotion === "happy"){
-    utterance.pitch = 1.25;
+    utterance.pitch = 1.2;
   }
 
   if(emotion === "angry"){
-    utterance.pitch = 0.75;
+    utterance.pitch = 0.7;
   }
 
   speechSynthesis.speak(utterance);
@@ -907,15 +655,11 @@ function startShadowing(){
 
   speakConversation();
 
-  document.getElementById("status")
-  .innerText =
-    "シャドーイング準備中";
-
   setTimeout(()=>{
 
     startRecognition();
 
-  },3500);
+  },3000);
 }
 
 function normalizeEnglish(text){
@@ -926,14 +670,7 @@ function normalizeEnglish(text){
 
     [/want to/g,"wanna"],
     [/going to/g,"gonna"],
-    [/got to/g,"gotta"],
     [/did you/g,"didja"],
-    [/would you/g,"wouldja"],
-    [/could you/g,"couldja"],
-    [/kind of/g,"kinda"],
-    [/out of/g,"outta"],
-    [/a lot of/g,"alotta"],
-    [/them/g,"em"],
     [/ing/g,"in"]
 
   ];
@@ -1065,16 +802,7 @@ function evaluateFreeSpeech(text){
 
   if(
     text.includes("because") ||
-    text.includes("however") ||
-    text.includes("although")
-  ){
-    score += 10;
-  }
-
-  if(
-    text.includes("society") ||
-    text.includes("government") ||
-    text.includes("technology")
+    text.includes("however")
   ){
     score += 10;
   }
@@ -1094,10 +822,7 @@ TH音は舌先を軽く前歯に当てましょう。<br><br>
 
 R音は口の奥で響かせると自然になります。<br><br>
 
-英語特有の強弱リズムを意識しましょう。<br><br>
-
-単語同士を滑らかにつなげると
-ネイティブらしく聞こえます。
+単語同士を滑らかにつなげましょう。
 
 `;
 }
@@ -1109,28 +834,21 @@ function generateNativeFeedback(spoken){
   if(spoken.includes("gonna")){
 
     result.push(
-      "going to → gonna の崩しが自然です"
+      "going to → gonna が自然です"
     );
   }
 
   if(spoken.includes("wanna")){
 
     result.push(
-      "want to → wanna のリンキングが自然です"
-    );
-  }
-
-  if(spoken.includes("didja")){
-
-    result.push(
-      "did you → didja が自然です"
+      "want to → wanna が自然です"
     );
   }
 
   if(result.length===0){
 
     result.push(
-      "リエゾンをさらに増やすと自然です"
+      "リエゾンを増やすと自然です"
     );
   }
 
@@ -1145,10 +863,7 @@ function generateAIComment(score){
 
 非常に自然な英語です。<br><br>
 
-英検1級やIELTSでも高評価が期待できます。<br><br>
-
-発音・流暢さ・自然さの
-バランスが優れています。
+英検1級レベルに近いです。
 
 `;
   }
@@ -1159,124 +874,32 @@ function generateAIComment(score){
 
 かなり良い英語です。<br><br>
 
-さらにネイティブらしくするには、
-語尾を弱めて発音してみましょう。
+さらに滑らかさを意識しましょう。
 
 `;
   }
 
   return `
 
-内容は十分伝わります。<br><br>
-
-理由・具体例・結論を意識すると
-さらに説得力が増します。
+理由・具体例・結論を
+意識すると良くなります。
 
 `;
 }
 
-function startRecognition(){
+function processSpeechResult(spoken){
 
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
+  const mode =
+    document.getElementById("mode").value;
 
-  if(!SpeechRecognition){
+  if(
+    mode === "discussion" ||
+    mode === "improv" ||
+    mode === "roleplay"
+  ){
 
-    alert(
-      "このブラウザは未対応です"
-    );
-
-    return;
-  }
-
-  const recognition =
-    new SpeechRecognition();
-
-  recognition.lang = "en-US";
-
-  recognition.interimResults = false;
-
-  recognition.maxAlternatives = 1;
-
-  document.getElementById("status")
-  .innerText =
-    "音声認識中";
-
-  recognition.onresult = function(event){
-
-    const spoken =
-      event.results[0][0].transcript;
-
-    const mode =
-      document.getElementById("mode").value;
-
-    if(
-      mode === "discussion" ||
-      mode === "improv" ||
-      mode === "roleplay"
-    ){
-
-      const freeScore =
-        evaluateFreeSpeech(spoken);
-
-      document.getElementById("result")
-      .innerHTML =
-
-`
-<div class="point">
-
-<b>
-あなた：
-</b>
-
-<br>
-
-${spoken}
-
-</div>
-`;
-
-      document.getElementById("score")
-      .innerText =
-        freeScore + "%";
-
-      document.getElementById("feedbackText")
-      .innerHTML =
-        generateFeedback();
-
-      document.getElementById("nativeFeedback")
-      .innerHTML =
-        generateNativeFeedback(spoken);
-
-      document.getElementById("aiFeedback")
-      .innerHTML =
-
-`
-論理的に話そうとする姿勢が見られます。<br><br>
-
-さらに：
-<ul>
-<li>具体例</li>
-<li>理由</li>
-<li>結論</li>
-</ul>
-
-を加えると、
-英検1級らしい回答になります。
-`;
-
-      return;
-    }
-
-    const convo =
-      getConversations()[currentIndex];
-
-    const best =
-      getBestScore(
-        convo.answers,
-        spoken
-      );
+    const freeScore =
+      evaluateFreeSpeech(spoken);
 
     document.getElementById("result")
     .innerHTML =
@@ -1284,32 +907,18 @@ ${spoken}
 `
 <div class="point">
 
-<b>
-あなた：
-</b>
+<b>あなた：</b>
 
 <br>
 
 ${spoken}
 
 </div>
-
-<div class="point">
-
-<b>
-模範解答：
-</b>
-
-<br>
-
-${best.answer}
-
-</div>
 `;
 
     document.getElementById("score")
     .innerText =
-      best.score + "%";
+      freeScore + "%";
 
     document.getElementById("feedbackText")
     .innerHTML =
@@ -1321,36 +930,238 @@ ${best.answer}
 
     document.getElementById("aiFeedback")
     .innerHTML =
-      generateAIComment(best.score);
 
-    if(best.score >= 85){
+`
+論理展開は良好です。<br><br>
 
-      document.getElementById("status")
-      .innerText =
-        "Excellent!";
+さらに：
+<ul>
+<li>理由</li>
+<li>具体例</li>
+<li>結論</li>
+</ul>
 
-      setTimeout(()=>{
+を意識しましょう。
+`;
 
-        nextConversation();
+    return;
+  }
 
-      },1800);
+  const convo =
+    getConversations()[currentIndex];
 
-    }else{
+  const best =
+    getBestScore(
+      convo.answers,
+      spoken
+    );
 
-      document.getElementById("status")
-      .innerText =
-        "もう一度挑戦してみましょう";
-    }
-  };
+  document.getElementById("result")
+  .innerHTML =
 
-  recognition.onerror = function(){
+`
+<div class="point">
+
+<b>あなた：</b>
+
+<br>
+
+${spoken}
+
+</div>
+
+<div class="point">
+
+<b>模範解答：</b>
+
+<br>
+
+${best.answer}
+
+</div>
+`;
+
+  document.getElementById("score")
+  .innerText =
+    best.score + "%";
+
+  document.getElementById("feedbackText")
+  .innerHTML =
+    generateFeedback();
+
+  document.getElementById("nativeFeedback")
+  .innerHTML =
+    generateNativeFeedback(spoken);
+
+  document.getElementById("aiFeedback")
+  .innerHTML =
+    generateAIComment(best.score);
+
+  if(best.score >= 85){
 
     document.getElementById("status")
     .innerText =
-      "認識エラー";
+      "Excellent!";
+
+  }else{
+
+    document.getElementById("status")
+    .innerText =
+      "もう一度挑戦してみましょう";
+  }
+}
+
+function startRecognition(){
+
+  if(isRecognizing){
+    return;
+  }
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+
+    alert(
+      "このブラウザは音声認識に未対応です。\nSafari最新版を使用してください。"
+    );
+
+    return;
+  }
+
+  try{
+
+    recognition =
+      new SpeechRecognition();
+
+  }catch(e){
+
+    console.log(e);
+
+    alert(
+      "音声認識の初期化に失敗しました。"
+    );
+
+    return;
+  }
+
+  isRecognizing = true;
+
+  const button =
+    document.querySelector(".record-btn");
+
+  button.disabled = true;
+
+  document.getElementById("status")
+  .innerText =
+    "音声認識中...";
+
+  recognition.lang = "en-US";
+
+  recognition.interimResults = false;
+
+  recognition.continuous = false;
+
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = function(event){
+
+    try{
+
+      const spoken =
+        event.results[0][0].transcript;
+
+      processSpeechResult(spoken);
+
+    }catch(e){
+
+      console.log(e);
+
+      document.getElementById("status")
+      .innerText =
+        "解析エラー";
+    }
   };
 
-  recognition.start();
+  recognition.onerror = function(event){
+
+    console.log(event.error);
+
+    let message = "";
+
+    switch(event.error){
+
+      case "not-allowed":
+        message =
+          "マイク権限が拒否されています";
+        break;
+
+      case "no-speech":
+        message =
+          "音声が検出されませんでした";
+        break;
+
+      case "audio-capture":
+        message =
+          "マイクが見つかりません";
+        break;
+
+      case "network":
+        message =
+          "ネットワークエラー";
+        break;
+
+      default:
+        message =
+          "認識エラー: " + event.error;
+    }
+
+    document.getElementById("status")
+    .innerText =
+      message;
+
+    isRecognizing = false;
+
+    button.disabled = false;
+  };
+
+  recognition.onend = function(){
+
+    isRecognizing = false;
+
+    button.disabled = false;
+
+    recognition = null;
+
+    if(
+      document.getElementById("status")
+      .innerText ===
+      "音声認識中..."
+    ){
+
+      document.getElementById("status")
+      .innerText =
+        "待機中";
+    }
+  };
+
+  try{
+
+    recognition.start();
+
+  }catch(e){
+
+    console.log(e);
+
+    document.getElementById("status")
+    .innerText =
+      "起動エラー";
+
+    isRecognizing = false;
+
+    button.disabled = false;
+  }
 }
 
 loadConversation();
